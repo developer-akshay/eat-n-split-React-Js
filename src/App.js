@@ -27,6 +27,8 @@ function Button ({children,onClick}){
 
 function App() {
   const [showAddFriend,setShowAddFriend]=useState(false);
+  let [name,setName]=useState('')
+  const [iamge,setImage]=useState('');
 
   const handleShowAddFriend = () => {
     setShowAddFriend((show)=>!show)
@@ -37,10 +39,7 @@ function App() {
       <div className="sidebar">
         <FriendList />
         {showAddFriend && <FormAddFriend />}
-        {/* {showAddFriend?
-        <Button onClick={handleShowAddFriend}>Close</Button>:
-        <Button onClick={handleShowAddFriend}>Add Friend</Button>
-        } */}
+        
         <Button onClick={handleShowAddFriend}>{showAddFriend?'Close':'Add Friend'}</Button>
         
         
