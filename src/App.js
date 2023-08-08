@@ -26,19 +26,25 @@ function Button ({children,onClick}){
 }
 
 function App() {
+  const [friends,setFriends]=useState(initialFriends);
   const [showAddFriend,setShowAddFriend]=useState(false);
-  let [name,setName]=useState('')
-  const [iamge,setImage]=useState('');
 
   const handleShowAddFriend = () => {
     setShowAddFriend((show)=>!show)
   }
 
+  const handleAddFriend= (friend) => {
+    //we don't use push here because it will add value to state and will not do rerender 
+    //as react is immuatable you should create a new array of friends instead of updating it
+    setFriends((friends)=>[...friends,friend])
+    setShowAddFriend(false)
+  }
+
   return (
     <div className="app">
       <div className="sidebar">
-        <FriendList />
-        {showAddFriend && <FormAddFriend />}
+        <FriendList friends={friends}/>
+        {showAddFriend && <FormAddFriend onAddFriend={handleAddFriend} />}
         
         <Button onClick={handleShowAddFriend}>{showAddFriend?'Close':'Add Friend'}</Button>
         
@@ -51,8 +57,7 @@ function App() {
 
 export default App;
 
-function FriendList (){
-  const friends=initialFriends;
+function FriendList ({friends}){
   return (
   <ul>
     {friends.map((friend)=>(
@@ -69,20 +74,20 @@ function  Friend ({friend}){
   return (
   <li>
     <img src={friend.image} alt={friend.name} />
-    <h3>{friend.name}</h3>
+    <h3>{(friend.name?friend.name:friend.namee)}</h3>
     {friend.balance <0 && (
       <p className="red">
-        you owe {friend.name} Rs {Math.abs(friend.balance)}  
+        you owe {(friend.name?friend.name:friend.namee)} Rs {Math.abs(friend.balance)}  
       </p>
     )}
     {friend.balance >0 && (
       <p className="green">
-        {friend.name} owe you Rs {Math.abs(friend.balance)}  
+        {(friend.name?friend.name:friend.namee)} owe you Rs {Math.abs(friend.balance)}  
       </p>
     )}
     {friend.balance ===0 && (
       <p>
-        you and {friend.name} are even. 
+        you and {(friend.name?friend.name:friend.namee)} are even. 
       </p>
     )}
     <Button >Select</Button>
@@ -90,14 +95,47 @@ function  Friend ({friend}){
     )
 }
 
-function FormAddFriend(){
+function FormAddFriend({onAddFriend}){
+  const [namee,setName]=useState('')
+  const [image,setImage]=useState('https://i.pravatar.cc/48');
+  
+  const handleSubmit = (e)=> {
+    //at single page application we need this as it prevents reloading of app
+    e.preventDefault();
+
+    //if there's no name or image it will not execute below code
+    if(!namee || !image ) return;
+
+    const id = crypto.randomUUID();
+    const newFriend={
+      id,
+      namee,
+      image:`${image}?=${id}`,
+      balance:0
+    }
+    console.log('before handle submit',newFriend)
+    onAddFriend(newFriend)
+    
+    //setting values to default 
+    setName('');
+    setImage('https://i.pravatar.cc/48');
+
+  }
   return(
-    <form className="form-add-friend">
+    <form className="form-add-friend"
+    onSubmit={handleSubmit}
+    >
       <label>🧑‍🤝‍🧑Friend Name</label>
-      <input type="text"/>
+      <input type="text" 
+      value={namee}
+      onChange={(e)=>setName(e.target.value)}
+      />
 
       <label>🖼️ Image Url</label>
-      <input type="text" />
+      <input type="text"
+      value={image}
+      onChange={(e)=>setImage(e.target.value)}
+      />
 
       <Button>Add</Button>
     </form>
