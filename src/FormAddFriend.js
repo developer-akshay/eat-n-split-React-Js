@@ -21,7 +21,7 @@ function FormAddFriend({onAddFriend}){
         image:`${image}?=${id}`,
         balance:0
       }
-      console.log('before handle submit',newFriend)
+      
       onAddFriend(newFriend)
       
       //setting values to default 
